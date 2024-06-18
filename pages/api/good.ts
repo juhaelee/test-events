@@ -12,7 +12,7 @@ const cors = Cors({
 function runMiddleware(
   req: NextApiRequest,
   res: NextApiResponse,
-  fn: Function,
+  fn: Function
 ) {
   return new Promise((resolve, reject) => {
     fn(req, res, (result: any) => {
@@ -27,11 +27,28 @@ function runMiddleware(
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
   // Run the middleware
   await runMiddleware(req, res, cors);
 
   // Rest of the API logic
+  fetch("https://us-east-1.hightouch-events.com/v1/track", {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${process.env.HIGHTOUCH_API_KEY}`,
+      "Content-type": "application/json",
+    },
+    body: JSON.stringify({
+      userId: "1",
+      event: "Order Completed",
+      properties: {
+        name: "candy",
+        price: 0.99,
+      },
+      context: {},
+    }),
+  });
+
   res.json({ message: "Hello Everyone!" });
 }
